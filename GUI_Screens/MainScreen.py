@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QFont, QColor, QCursor
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, QPoint, QSize
 
+
+
 class ActionCard(QFrame):
     def __init__(self, title, description, emoji, callback, parent=None):
         super().__init__(parent)
@@ -207,7 +209,7 @@ class MainScreen(QWidget):
         self.cards_data = [
             ("Create Installer", "Download macOS and create a bootable USB drive.", "🚀", self.create_installer),
             ("Select Image", "Use a pre-downloaded macOS image file.", "💿", self.select_image),
-            ("Select EFI", "Verify and install an existing EFI configuration.", "⚙️", self.select_efi),
+            ("Create & Select EFI", "Verify and install an existing EFI configuration.", "⚙️", self.select_efi),
             ("Help & Guides", "Documentation and troubleshooting steps.", "❓", self.open_help),
         ]
 
@@ -284,7 +286,15 @@ class MainScreen(QWidget):
 
     # Actions
     def create_installer(self):
-        QMessageBox.information(self, "Create Installer", "Opening installer creator...")
+        try:
+            from .DownloadImage import DownloadImageScreen
+            self.download_window = DownloadImageScreen(parent=self)
+            # Pass current theme
+            self.download_window.apply_theme(self.current_theme)
+            self.download_window.setWindowModality(Qt.ApplicationModal)
+            self.download_window.show()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to open downloader: {e}")
     
     def select_image(self):
         QMessageBox.information(self, "Select Image", "Opening image selector...")
